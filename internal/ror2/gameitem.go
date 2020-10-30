@@ -21,3 +21,11 @@ func NewGameItem(name, description, cooldown, acquiredFrom string) GameItem {
 func (g GameItem) String() string {
 	return fmt.Sprintf("%s: %s Scaling/Cooldown: %s", g.Name, g.Description, g.Cooldown)
 }
+
+func (g GameItems) String(i int) string {
+	return g[i].Name
+}
+
+func (g GameItems) Len() int {
+	return len(g)
+}
