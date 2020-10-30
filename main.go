@@ -5,19 +5,8 @@ import (
 	"os"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/dkravetz/risk_of_rain_items_chatbot/internal/ror2"
 )
-
-type GameItem struct {
-	Name        string
-	Description string
-	Cooldown    string
-}
-
-func New(name, description, cooldown string) *GameItem {
-	return &GameItem{Name: name, Description: description, Cooldown: cooldown}
-}
-
-type GameItems []GameItem
 
 func main() {
 	f, err := os.Open("files/ror2_items.html")
@@ -34,7 +23,7 @@ func main() {
 	}
 
 	// Get rows into an array. each element represents a GameItem
-	var gameItems GameItems
+	var gameItems ror2.GameItems
 	var columns []string
 	var rows [][]string
 	doc.Find(".article-table").Each(func(i int, table *goquery.Selection) {
@@ -48,7 +37,7 @@ func main() {
 	})
 
 	for _, item := range rows {
-		gameItems = append(gameItems, GameItem{item[0], item[1], item[2]})
+		gameItems = append(gameItems, *ror2.NewGameItem(item[0], item[1], item[2]))
 	}
 
 }
