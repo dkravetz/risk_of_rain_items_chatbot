@@ -9,17 +9,18 @@ import (
 )
 
 func main() {
-	wordPtr := flag.String("word", "Tri-Tip Dagger", "Name of item to search")
+	wordPtr := flag.String("word", "Tri Tip", "Name of item to search")
 	flag.Parse()
 
-	items, err := ror2.GetAllItemsFromFile("files/ror2_items.html")
-	// items, err := ror2.GetAllItemsFromURL("https://riskofrain2.gamepedia.com/Items#Boss")
+	items, err := ror2.FromJSON("items.json")
+	// items, err := ror2.UpdateItemListFromURL("https://riskofrain2.gamepedia.com/Items#Boss")
 	if err != nil {
 		panic(err)
 	}
 
-	results := fuzzy.FindFrom(*wordPtr, items)
-
-	fmt.Println(items[results[0].Index])
-
+	if results := fuzzy.FindFrom(*wordPtr, items); results != nil {
+		fmt.Println(items[results[0].Index])
+	} else {
+		fmt.Println("Sorry, can't find results")
+	}
 }

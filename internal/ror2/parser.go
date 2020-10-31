@@ -3,44 +3,32 @@ package ror2
 import (
 	"log"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
-// GetAllItemsFromFile parses an html file instead of doing a network request
-func GetAllItemsFromFile(filePath string) (GameItems, error) {
-	f, err := os.Open(filePath)
-	if err != nil {
-		log.Fatal("Couldn't open file. ", err)
-	}
-	defer f.Close()
-
-	doc, err := goquery.NewDocumentFromReader(f)
-	if err != nil {
-		log.Fatal("Couldn't parse html. ", err)
-	}
-
-	return getItemsDocument(doc), err
-}
-
-// GetAllItemsFromURL does a network request to the specified URL and parses the results
-func GetAllItemsFromURL(url string) (GameItems, error) {
+// UpdateItemListFromURL does a network request to the specified URL and parses the results
+func UpdateItemListFromURL(url string) (GameItems, error) {
 	res, err := http.Get(url)
 	if err != nil {
 		log.Fatal("Couldn't request URL. ", err)
+		return nil, err
 	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
 		log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
+		return nil, err
 	}
 
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	if err != nil {
 		log.Fatal("Couldn't parse html. ", err)
+		return nil, err
 	}
-	return getItemsDocument(doc), err
+	gameItems := getItemsDocument(doc)
+	gameItems.ToJSON("items.json")
+	return gameItems, err
 }
 
 func getItemsDocument(doc *goquery.Document) GameItems {
