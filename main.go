@@ -1,15 +1,17 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
+	"os"
 
 	"github.com/dkravetz/risk_of_rain_items_chatbot/internal/ror2"
 	"github.com/sahilm/fuzzy"
 )
 
 func main() {
-	wordPtr := flag.String("word", "Tri Tip", "Name of item to search")
+	itemPtr := flag.String("item", "", "Name of item to search")
 	flag.Parse()
 
 	items, err := ror2.FromJSON("items.json")
@@ -18,9 +20,30 @@ func main() {
 		panic(err)
 	}
 
-	if results := fuzzy.FindFrom(*wordPtr, items); results != nil {
-		fmt.Println(items[results[0].Index])
+	// Why can't I just `if (*itemPtr){}` ??
+	if *itemPtr == "" {
+		interactiveMode(&items)
 	} else {
-		fmt.Println("Sorry, can't find results")
+		if results := fuzzy.FindFrom(*itemPtr, items); results != nil {
+			fmt.Println(items[results[0].Index])
+		} else {
+			fmt.Println("Sorry, can't find results")
+		}
+	}
+}
+
+func interactiveMode(items *ror2.GameItems) {
+	fmt.Println("Type in the name of the item you're looking for:")
+	scanner := bufio.NewScanner(os.Stdin)
+	for scanner.Scan() {
+		if scanner.Text() == "quit" || scanner.Text() == "exit" {
+			os.Exit(0)
+		}
+		if results := fuzzy.FindFrom(scanner.Text(), items); results != nil {
+			fmt.Println((*items)[results[0].Index])
+		} else {
+			fmt.Println("Sorry, can't find results")
+		}
+		fmt.Println("Type in the name of the item you're looking for:")
 	}
 }
