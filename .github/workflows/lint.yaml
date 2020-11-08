@@ -10,23 +10,23 @@ on:
 
 jobs:
   lint:
-  name: Lint code
-  runs-on: ubuntu-20.04
+    name: Lint code
+    runs-on: ubuntu-20.04
 
-  steps:
-    - name: Install Golang
-      uses: actions/setup-go@v2
-      with:
-        go-version: "~1.15"
+    steps:
+      - name: Install Golang
+        uses: actions/setup-go@v2
+        with:
+          go-version: "~1.15"
 
-    - name: Install dependencies
-      run: go get -u golang.org/x/lint/golint
+      - name: Install dependencies
+        run: go get -u golang.org/x/lint/golint
 
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Go vet
-      run: go vet .
+      - name: Go vet
+        run: go vet .
 
-    - name: Go lint
-      run: golint .
+      - name: Go lint
+        run: golint .
